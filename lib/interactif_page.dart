@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'langage_favoris.dart';
-import 'package:projet_interactif/simple_title.dart';
-import 'package:projet_interactif/style_text.dart';
-import 'divider_grey.dart';
+import 'package:projet_interactif/all_profile.dart';
+import 'package:projet_interactif/taille.dart';
+import 'Component/divider_grey.dart';
+import 'package:projet_interactif/genre.dart';
+import 'Component/my_fieldtext.dart';
+import 'Component/my_title.dart';
+import 'mes_hobbies.dart';
 
 class InteractifPage extends StatefulWidget {
   const InteractifPage({super.key});
@@ -12,16 +15,12 @@ class InteractifPage extends StatefulWidget {
 }
 
 class InteractifPageState extends State<InteractifPage> {
-  String prenom = "";
-  String nom = "";
-  String secret = "";
-  String age = "";
-  String genre = "Féminin";
-  bool switchValue = true;
-  double sliderValue = 50;
-  bool check = false;
-  int groupValue = 1;
-  bool buttonPressed = false;
+  AllProfile myProfile = AllProfile(surname: "Christine", name: "Prade");
+  late TextEditingController surname;
+  late TextEditingController name;
+  late TextEditingController secret;
+  late TextEditingController age;
+  bool showSecret = false;
 
   Map<String, bool> hobbies = {
     "Jeux vidéos": false,
@@ -31,18 +30,25 @@ class InteractifPageState extends State<InteractifPage> {
     "Randonnée": false,
   };
 
-  List<String> myHobbies = [];
-
   @override
   void initState() {
     super.initState();
-    // Tout ce que l'on va faire pendant l'initialisation du Widget
+    surname = TextEditingController();
+    name = TextEditingController();
+    secret = TextEditingController();
+    age = TextEditingController();
+    surname.text = myProfile.surname;
+    name.text = myProfile.name;
+    secret.text = myProfile.secret;
+    age.text = myProfile.age.toString();
   }
 
   @override
   void dispose() {
+    surname.dispose();
+    name.dispose();
+    secret.dispose();
     super.dispose();
-    // Tout ce que l'on va faire quand le Widget sera dispose. Quand le Widget sera supprimé
   }
 
   @override
@@ -50,12 +56,10 @@ class InteractifPageState extends State<InteractifPage> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const StyleText(
-          text: "Mon profil",
-        ),
+        title: const Text("Mon profil"),
       ),
-      body: SizedBox(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: SizedBox(
           child: Column(
             children: [
               Container(
@@ -65,153 +69,49 @@ class InteractifPageState extends State<InteractifPage> {
                 color: const Color.fromRGBO(188, 143, 143, 1),
                 child: Column(
                   children: [
-                    StyleText(
-                      text: "Personne : $prenom $nom",
-                    ),
-                    StyleText(
-                      text: "Age: $age ans",
-                    ),
-                    StyleText(
-                      text: "Taille: ${sliderValue.toInt()} cm",
-                    ),
-                    StyleText(
-                      text: "Genre: $genre",
-                    ),
-                    StyleText(
-                      text: "Hobbies: $myHobbies",
-                    ),
-                    LanguageFavoris(),
+                    Text(myProfile.setName()),
+                    Text("Age: ${myProfile.setAge()}"),
+                    Text("Taille: ${myProfile.setHeight()}"),
+                    Text("Genre: ${myProfile.genderString()}"),
+                    Text("Hobbies: ${myProfile.setHobbies()}"),
+                    Text(
+                        "Langage de programmation favori: ${myProfile.favoriteLang} "),
                     ElevatedButton(
-                        onPressed: () =>
-                            setState(() => buttonPressed = !buttonPressed),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          elevation: 10,
-                        ),
-                        child: StyleText(
-                            text: buttonPressed
-                                ? "Cacher le secret"
-                                : "Voir le secret")),
-                    StyleText(
-                      text: buttonPressed ? secret : "",
-                    )
+                        onPressed: updateSecret,
+                        child: Text(
+                            (showSecret) ? "Cacher secret" : "Montrer secret")),
+                    (showSecret)
+                        ? Text(myProfile.secret)
+                        : Container(
+                            height: 0,
+                            width: 0,
+                          ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8, height: 8),
               const DividerGrey(),
-              const SizedBox(width: 8, height: 8),
-              Column(
-                children: [
-                  const SimpleTitle(text: "Modifier les informations"),
-                  const SizedBox(width: 15, height: 15),
-                  TextField(
-                      decoration: InputDecoration(
-                          hintText: "Entrez votre prénom",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          )),
-                      onChanged: (newString) {
-                        setState(() {
-                          prenom = newString;
-                        });
-                      }),
-                  const SizedBox(width: 15, height: 15),
-                  TextField(
-                      decoration: InputDecoration(
-                          hintText: "Entrez votre nom",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          )),
-                      onChanged: (newString) {
-                        setState(() {
-                          nom = newString;
-                        });
-                      }),
-                  const SizedBox(width: 15, height: 15),
-                  TextField(
-                      decoration: InputDecoration(
-                          hintText: "Entrez votre age",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          )),
-                      keyboardType: TextInputType.number,
-                      onChanged: (newString) {
-                        setState(() {
-                          age = newString;
-                        });
-                      }),
-                  const SizedBox(width: 15, height: 15),
-                  TextField(
-                      decoration: InputDecoration(
-                          hintText: "Ecrivez un secret",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          )),
-                      obscureText: true,
-                      onChanged: (newString) {
-                        setState(() {
-                          secret = newString;
-                        });
-                      }),
-                  const SizedBox(width: 8, height: 8),
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Genre : $genre"),
-                  Switch(
-                      value: switchValue,
-                      onChanged: ((bool) {
-                        setState(() {
-                          switchValue = bool;
-                          genre = (switchValue) ? "Féminin" : "Masculin";
-                        });
-                      }))
-                ],
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Taille: ${sliderValue.toInt()}"),
-                  Slider(
-                    value: sliderValue,
-                    min: 0,
-                    max: 250,
-                    onChanged: ((newValue) {
-                      setState(() {
-                        sliderValue = newValue;
-                      });
-                    }),
-                    thumbColor: Colors.lightBlue,
-                    activeColor: Colors.lightBlueAccent,
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8, height: 8),
+              myTitle("Modifier les infos"),
+              const SizedBox(width: 15, height: 15),
+              myTextField(controller: surname, hint: "Entrez votre prénom"),
+              const SizedBox(width: 15, height: 15),
+              myTextField(controller: name, hint: "Entrez votre nom"),
+              const SizedBox(width: 15, height: 15),
+              myTextField(
+                  controller: secret,
+                  hint: "Dites nous un secret",
+                  isSecret: true),
+              const SizedBox(width: 15, height: 15),
+              myTextField(
+                  controller: age,
+                  hint: "Entrez votre age",
+                  type: TextInputType.number),
+              const SizedBox(width: 15, height: 15),
+              const Genre(),
+              const Taille(),
               const DividerGrey(),
-              const SizedBox(width: 8, height: 8),
-              Column(
-                children: [
-                  const SimpleTitle(text: "Mes hobbies"),
-                  const SizedBox(width: 8, height: 8),
-                  checks(),
-                ],
-              ),
-              const SizedBox(width: 8, height: 8),
+              const MyHobbies(),
               const DividerGrey(),
-              const SizedBox(width: 8, height: 8),
-              Column(
-                children: [
-                  const SimpleTitle(text: "Langage préféré"),
-                  LanguageFavoris(),
-                  const SizedBox(width: 8, height: 8),
-                  radios(),
-                ],
-              ),
+              myRadios()
             ],
           ),
         ),
@@ -219,55 +119,56 @@ class InteractifPageState extends State<InteractifPage> {
     );
   }
 
-  Row radios() {
-    List<Widget> radios = [];
-    for (var i = 0; i < 5; i++) {
-      Widget r = Radio(
-          activeColor: Colors.greenAccent,
-          value: i,
-          groupValue: groupValue,
-          onChanged: ((newValue) {
-            setState(() {
-              groupValue = newValue as int;
-            });
-          }));
-      radios.add(r);
+  updateSecret() {
+    setState(() {
+      showSecret = !showSecret;
+    });
+  }
+
+  Column myRadios() {
+    List<Widget> w = [];
+    List<String> langs = ["Dart", "Php", "Javascript", "Java", "Python"];
+    int index =
+        langs.indexWhere((lang) => lang.startsWith(myProfile.favoriteLang));
+    for (var x = 0; x < langs.length; x++) {
+      Column c = Column(
+        children: [
+          Text(langs[x]),
+          Radio(
+              activeColor: Colors.lightGreen,
+              value: x,
+              groupValue: index,
+              onChanged: (newValue) {
+                setState(() {
+                  myProfile.favoriteLang = langs[newValue as int];
+                });
+              })
+        ],
+      );
+      w.add(c);
     }
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: radios,
+    return Column(
+      children: [
+        myTitle("Langage préféré"),
+        const SizedBox(width: 15, height: 15),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: w)
+      ],
     );
   }
 
-  Column checks() {
-    List<Widget> items = [];
-    hobbies.forEach((hobbie, ajouter) {
-      Widget row = Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(hobbie),
-          Checkbox(
-            value: ajouter,
-            onChanged: ((newValue) {
-              setState(() {
-                hobbies[hobbie] = newValue ?? false;
-                if (newValue == true) {
-                  myHobbies.add(hobbie);
-                } else {
-                  myHobbies.remove(hobbie);
-                }
-              });
-            }),
-            activeColor: Colors.pink,
-          )
-        ],
-      );
-      items.add(row);
+  updateUser() {
+    setState(() {
+      myProfile = AllProfile(
+          surname: (surname.text != myProfile.surname)
+              ? surname.text
+              : myProfile.surname,
+          name: name.text,
+          secret: secret.text,
+          favoriteLang: myProfile.favoriteLang,
+          hobbies: myProfile.hobbies,
+          height: myProfile.height,
+          age: int.parse(age.text),
+          gender: myProfile.gender);
     });
-    return Column(
-      children: items,
-    );
   }
 }
